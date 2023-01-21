@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImageController;
-use App\Http\Controllers\StoreController;
+use App\Http\Controllers\InventoryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,15 +17,19 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-session()->forget('base64Images');
 Route::get('/', HomeController::class)->name('home');
-Route::prefix('store')->name('store.')->controller(StoreController::class)->group(function () {
+Route::prefix('inventory')->name('inventory.')->controller(InventoryController::class)->group(function () {
     Route::get('create', 'create')->name('create');
+    Route::get('/', 'index')->name('index');
     Route::post('store', 'store')->name('store');
     Route::post('confirm', 'postConfirm')->name('postConfirm');
     Route::get('confirm', 'confirm')->name('confirm');
 });
 
-Route::prefix('image')->name('image')->group(function () {
+Route::prefix('auth')->name('auth.')->controller(AuthController::class)->group(function(){
+    Route::get('/login', 'login')->name('login');
+});
+
+Route::prefix('image')->name('image.')->group(function () {
     Route::post('pre-upload', [ImageController::class, 'preUpload'])->name('preUpload');
 });

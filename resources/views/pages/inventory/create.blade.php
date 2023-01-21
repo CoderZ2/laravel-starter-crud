@@ -2,7 +2,7 @@
     <div class="container">
         <div class="flex justify-center">
             <form class="max-w-[520px] w-[100%] border p-[30px] border-dashed border-green-400 mb-6"
-                  action="{{ route('store.postConfirm') }}"
+                  action="{{ route('inventory.postConfirm') }}"
                   method="POST">
                 @method('POST')
                 @csrf
@@ -54,7 +54,7 @@
                               id="message"
                               name="description"
                               rows="4"
-                              placeholder="Write your thoughts here..."></textarea>
+                              placeholder="Write your thoughts here...">{{ session('createData')['description'] ?? old('description') }}</textarea>
                 </div>
                 <div x-data="storeCreate">
                     <input type="file"
@@ -94,8 +94,10 @@
                             </svg>
                         </div>
                     </div>
-                    <button class="text-white mb-6 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-                            type="submit">Confirm</button>
+                    <div class="flex justify-end">
+                        <button class="text-white mb-6 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                        type="submit">Confirm</button>
+                    </div>
                 </div>
             </form>
         </div>

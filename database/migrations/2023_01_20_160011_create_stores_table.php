@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('price');
             $table->integer('total')->default(0);
-            $table->longText('description');
+            $table->longText('description')->nullable();
             $table->timestamps();
         });
     }

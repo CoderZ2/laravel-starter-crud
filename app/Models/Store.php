@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Images;
+use App\Models\Image;
 
 class Store extends Model
 {
@@ -14,6 +14,6 @@ class Store extends Model
 
     public function images()
     {
-        return $this->morphMany(Images::class, 'imageable');
+        return $this->morphMany(Image::class, 'imageable');
     }
 }

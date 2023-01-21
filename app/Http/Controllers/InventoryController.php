@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRequest;
 use App\Models\Category;
-use App\Repository\StoreRepository;
+use App\Repository\InventoryRepository;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 
-class StoreController extends Controller
+class InventoryController extends Controller
 {
-    public function __construct(protected StoreRepository $storeRepository, protected ImageService $imageService)
+    public function __construct(protected InventoryRepository $inventoryRepository, protected ImageService $imageService)
     {
 
     }
@@ -22,8 +22,9 @@ class StoreController extends Controller
      */
     public function index()
     {
-        $data = $this->storeRepository()->getAll();
-        return view('pages.store.index', $data);
+        $data = $this->inventoryRepository->getAll();
+        dd($data);
+        return view('pages.inventory.index', $data);
     }
 
     /**
@@ -41,7 +42,7 @@ class StoreController extends Controller
 
         $categories = Category::toBase()->get();
 
-        return view('pages.store.create', compact('categories'));
+        return view('pages.inventory.create', compact('categories'));
     }
 
     /**
@@ -52,7 +53,7 @@ class StoreController extends Controller
     public function store()
     {
         $images = $this->imageService->base64Decode(session('base64Images', []));
-        $this->storeRepository->store(session('createData', []), $images);
+        $this->inventoryRepository->store(session('createData', []), $images);
     }
 
     /**
@@ -104,15 +105,15 @@ class StoreController extends Controller
     {
         session()->keep(['persists', 'createData']);
         if (!session()->has('persists')) {
-            return to_route('store.create');
+            return to_route('inventory.create');
         }
 
-        return view('pages.store.confirm');
+        return view('pages.inventory.confirm');
     }
 
     public function postConfirm(StoreRequest $request)
-    {
+    {   
         session()->flash('createData', array_merge($request->safe()->only(['name', 'price', 'category_id', 'description', 'total'])));
-        return to_route('store.confirm');
+        return to_route('inventory.confirm');
     }
 }
