@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Images extends Model
 {
     use HasFactory;
+    protected $fillable = ['url'];
 
     public function imageable()
     {

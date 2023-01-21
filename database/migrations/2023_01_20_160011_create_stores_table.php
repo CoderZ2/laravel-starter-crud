@@ -15,9 +15,11 @@ return new class extends Migration
     {
         Schema::create('stores', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
             $table->string('name');
             $table->string('price');
-            $table->integer('total');
+            $table->integer('total')->default(0);
+            $table->longText('description');
             $table->timestamps();
         });
     }
