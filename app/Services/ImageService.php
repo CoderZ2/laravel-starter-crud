@@ -1,7 +1,7 @@
 <?php
 namespace App\Services;
 
-use App\Models\Images;
+use App\Models\Image;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -22,14 +22,14 @@ class ImageService
     }
 
     public function base64Decode(array $base64EncodImages)
-    {   
+    {
         $images = [];
         foreach ($base64EncodImages as $image) {
-            $path = 'upload' . DIRECTORY_SEPARATOR . 'images';
-            $url = $path . DIRECTORY_SEPARATOR . $image['name'];
+            $path = 'upload' . '/' . 'images';
+            $url = $path . '/' . uniqid() . '-' . $image['name'];
             $file = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image['url']));
             Storage::put($url, $file);
-            $images[] = new Images([
+            $images[] = new Image([
                 'url' => $url,
             ]);
         }

@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
+    "./node_modules/flowbite/**/*.js",
     "./resources/**/*.blade.php",
     "./resources/**/*.js",
   ],
@@ -16,5 +17,7 @@ module.exports = {
 			xl: "1280px",
 		},
   },
-  plugins: [],
+  plugins: [
+    require('flowbite/plugin')
+  ],
 }

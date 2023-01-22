@@ -2,11 +2,24 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('storeCreate', () => ({
         serverData,
         serverImages: [],
-        get maxImage() {         
-            return this.serverImages.length + serverData.image.length < 4
+        uploadImageProgress: {},
+        maxImageCount: 4,
+        get maxImage() {
+            return this.serverImages.length + serverData.image.length < this.maxImageCount
         },
         async storeImage(el) {
             const files = el.files
+
+            if (!files[0].type.startsWith('image')) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'The file must be image',
+                    text: 'Something went wrong!',
+                })
+
+                return;
+            }
+
             const image = await this.compressImage(files[0], {
                 // 0: is maximum compression
                 // 1: is no compression
@@ -25,13 +38,27 @@ document.addEventListener('alpine:init', () => {
                 axios.post('/image/pre-upload', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
+                    },
+                    onUploadProgress: progressEvent => {
+                        const { loaded, total } = progressEvent;
+                        let percent = Math.floor((loaded * 100) / total);
+                        if (percent < 100) {
+                            this.uploadImageProgress.percent = percent;
+                            if (!this.uploadImageProgress.url) this.uploadImageProgress.url = e.target.result
+                        }
                     }
                 })
                     .then(res => {
+                        this.uploadImageProgress = {};
                         serverImages.push({ id: res.data.id, url: e.target.result })
                     })
                     .catch(error => {
-                        alert('error');
+                        this.uploadImageProgress = {};
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Server Error',
+                            text: 'Something went wrong!',
+                        })
                         console.error(error);
                     })
             }

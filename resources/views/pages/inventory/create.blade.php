@@ -1,7 +1,7 @@
 <x-layouts.app-layout>
     <div class="container">
         <div class="flex justify-center">
-            <form class="max-w-[520px] w-[100%] border p-[30px] border-dashed border-green-400 mb-6"
+            <form class="max-w-[520px] w-[100%] border p-[30px] border-dashed border-lime-400 mb-6"
                   action="{{ route('inventory.postConfirm') }}"
                   method="POST">
                 @method('POST')
@@ -9,7 +9,7 @@
                 <div class="mb-6">
                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                            for="name">Product name</label>
-                    <input class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-green-500 dark:focus:border-green-500"
+                    <input class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-lime-500 focus:border-lime-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-lime-500 dark:focus:border-lime-500"
                            id="name"
                            name="name"
                            type="name"
@@ -22,9 +22,10 @@
                 <div class="mb-6">
                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                            for="price">Price</label>
-                    <input class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-green-500 dark:focus:border-green-500"
+                    <input class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-lime-500 focus:border-lime-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-lime-500 dark:focus:border-lime-500"
                            id="price"
                            name="price"
+                           placeholder="100"
                            type="number"
                            value="{{ session('createData')['price'] ?? old('price') }}">
                     @error('price')
@@ -34,7 +35,7 @@
                 <div class="mb-6">
                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                            for="countries">Select an option</label>
-                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-green-500 dark:focus:border-green-500"
+                    <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-lime-500 focus:border-lime-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-lime-500 dark:focus:border-lime-500"
                             id="category_id"
                             name="category_id">
                         <option>Select Category</option>
@@ -50,7 +51,7 @@
                 <div class="mb-6">
                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                            for="message">Description</label>
-                    <textarea class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-green-500 dark:focus:border-green-500"
+                    <textarea class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-lime-500 focus:border-lime-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-lime-500 dark:focus:border-lime-500"
                               id="message"
                               name="description"
                               rows="4"
@@ -63,12 +64,31 @@
                            @click="$el.value=''"
                            @change="storeImage($el)">
                     <div class="grid grid-cols-3 gap-3 mb-6">
+                        <div
+                             x-cloak
+                             x-show="Object.keys(uploadImageProgress).length"
+                             class="block h-[100px] relative p-2  bg-white border border-gray-200 rounded-lg shadow-md  dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                            <div
+                                 class="absolute z-10 bg-gray-300 bg-opacity-60 w-[100%] top-0 left-0 h-[100%] px-5 flex justify-center items-center">
+                                <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
+                                    <div class="bg-lime-600 text-xs  font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
+                                         x-transition
+                                         x-bind:style="`width:${uploadImageProgress.percent}%`"
+                                         x-text="uploadImageProgress.percent + '%'">0%</div>
+                                </div>
+                            </div>
+                            <img class="w-[100%] h-[100%]"
+                                 alt="image"
+                                 x-bind:src="uploadImageProgress.url"
+                                 loading="lazy">
+                        </div>
                         @foreach (session('base64Images', []) as $image)
                             <div
                                  class="block h-[100px] p-2 cursor-pointer bg-white border border-gray-200 rounded-lg shadow-md hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
                                 <img class="w-[100%] h-[100%]"
                                      src="{{ $image['url'] }}"
-                                     alt="image">
+                                     alt="image"
+                                     loading="lazy">
                             </div>
                         @endforeach
                         <template x-for="image in serverImages">
@@ -79,7 +99,7 @@
                                      x-bind:src="image.url">
                             </div>
                         </template>
-                        <div class="border-dashed h-[100px] cursor-pointer  border border-green-400 flex justify-center items-center"
+                        <div class="border-dashed h-[100px] cursor-pointer  border border-lime-400 flex justify-center items-center"
                              x-show="maxImage"
                              @click="$refs.upload.click()">
                             <svg class="w-6 h-6"
@@ -95,8 +115,8 @@
                         </div>
                     </div>
                     <div class="flex justify-end">
-                        <button class="text-white mb-6 bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-                        type="submit">Confirm</button>
+                        <button class="text-white mb-6 bg-lime-700 hover:bg-lime-800 focus:ring-4 focus:outline-none focus:ring-lime-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-lime-600 dark:hover:bg-lime-700 dark:focus:ring-lime-800"
+                                type="submit">Confirm</button>
                     </div>
                 </div>
             </form>

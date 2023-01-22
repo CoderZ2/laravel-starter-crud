@@ -4,8 +4,13 @@
 
         <div
              class="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow-md sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
+             @error('credentials')
+                 <x-alert.danger :message="$message"/>
+             @enderror
             <form class="space-y-6"
-                  action="#">
+                  action="{{ route('auth.signIn') }}" method="POST">
+                  @csrf
+                  @method('POST')
                 <h5 class="text-xl font-medium text-gray-900 dark:text-white">Sign in to our platform</h5>
                 <div>
                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -16,6 +21,9 @@
                            type="email"
                            placeholder="name@company.com"
                            required>
+                    @error('email')
+                        <div class="text-red-500">{{ message }}</div>
+                    @enderror
                 </div>
                 <div>
                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -26,6 +34,9 @@
                            type="password"
                            placeholder="••••••••"
                            required>
+                    @error('password')
+                        <div class="text-red-500">{{ message }}</div>
+                    @enderror
                 </div>
                 <div class="flex items-start">
                     <div class="flex items-start">

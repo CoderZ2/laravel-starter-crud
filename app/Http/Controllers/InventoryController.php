@@ -20,10 +20,9 @@ class InventoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = $this->inventoryRepository->getAll();
-        dd($data);
+        $data = $this->inventoryRepository->getAll($request->search);
         return view('pages.inventory.index', $data);
     }
 
@@ -34,8 +33,6 @@ class InventoryController extends Controller
      */
     public function create(Request $request)
     {
-        session()->reflash('persists');
-
         if (!session('persists')) {
             session()->forget(['base64Images', 'confirm', 'createData']);
         }
@@ -54,6 +51,8 @@ class InventoryController extends Controller
     {
         $images = $this->imageService->base64Decode(session('base64Images', []));
         $this->inventoryRepository->store(session('createData', []), $images);
+        session()->forget(['base64Images', 'confirm', 'createData']);
+        return to_route('inventory.index');
     }
 
     /**
