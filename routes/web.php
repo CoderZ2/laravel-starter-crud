@@ -25,10 +25,15 @@ Route::prefix('inventory')
     ->middleware(['auth.login'])
     ->group(function () {
         Route::get('create', 'create')->name('create');
+        Route::get('edit/{id}', 'edit')->name('edit');
         Route::get('/', 'index')->name('index');
         Route::post('store', 'store')->name('store');
         Route::post('confirm', 'postConfirm')->name('postConfirm');
         Route::get('confirm', 'confirm')->name('confirm');
+
+        //update
+        Route::get('update-confirm', 'updateConfirm')->name('updateConfirm');
+        Route::post('update-confirm', 'updateConfirm')->name('updateConfirm');
     });
 
 Route::prefix('auth')

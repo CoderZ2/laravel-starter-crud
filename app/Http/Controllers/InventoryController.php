@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\InventoryUpdateRequest;
 use App\Http\Requests\StoreRequest;
 use App\Models\Category;
 use App\Repository\InventoryRepository;
@@ -63,7 +64,7 @@ class InventoryController extends Controller
      */
     public function show($id)
     {
-        //
+
     }
 
     /**
@@ -74,7 +75,12 @@ class InventoryController extends Controller
      */
     public function edit($id)
     {
-        //
+        if (!session()->has('persists')) {
+            session()->forget(['editInventoryData', 'oldImages', 'base64Images']);
+        }
+        $data = $this->inventoryRepository->edit($id);
+        session()->put('oldImages', $data['store']->images->toArray());
+        return view('pages.inventory.edit', $data);
     }
 
     /**
@@ -111,8 +117,26 @@ class InventoryController extends Controller
     }
 
     public function postConfirm(StoreRequest $request)
-    {   
+    {
         session()->flash('createData', array_merge($request->safe()->only(['name', 'price', 'category_id', 'description', 'total'])));
         return to_route('inventory.confirm');
+    }
+
+    public function updateConfirm(InventoryUpdateRequest $request)
+    {
+        if ($request->isMethod('POST')) {
+            session()->flash('persists');
+            session()->flash('editInventoryData', $request->except(['_token', '_method']));
+            return to_route('inventory.updateConfirm');
+        }
+
+        if ($request->isMethod('GET')) {
+            if (!session()->has('persists')) {
+                return to_route('inventory.create');
+            }
+
+            session()->keep(['editInventoryData', 'persists']);
+            return view('pages.inventory.edit-confirm');
+        }
     }
 }
