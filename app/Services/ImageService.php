@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Image;
@@ -21,12 +22,12 @@ class ImageService
         return compact('ext', 'url', 'id', 'name');
     }
 
-    public function base64Decode(array $base64EncodImages)
+    public function base64Decode(array $base64EncodeImages)
     {
         $images = [];
-        foreach ($base64EncodImages as $image) {
+        foreach ($base64EncodeImages as $image) {
             $path = 'upload' . '/' . 'images';
-            $url = $path . '/' . uniqid() . '-' . $image['name'];
+            $url = $path . '/' . uniqid() . '.' . $image['ext'];
             $file = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image['url']));
             Storage::put($url, $file);
             $images[] = new Image([

@@ -1,9 +1,14 @@
 <?php
+
 namespace App\Repository;
 
 use App\Models\Category;
 use App\Models\Store;
 use App\Repository\Repository;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class InventoryRepository extends Repository
 {
@@ -36,12 +41,51 @@ class InventoryRepository extends Repository
     public function edit($id)
     {
         $categories = Category::toBase()->get();
-        $store = Store::with(['images' => function ($query) {
-            return $query->when(session('editInventoryData')['deleteImageIds'] ?? false, function ($query, $delteImagesIds) {
-                $query->whereNotIn('id', $delteImagesIds);
+        $pattern = session('editInventoryData')['deleteOldImageIds'] ?? false;
+        $store = Store::with(['images' => function ($query)  use ($pattern) {
+            return $query->when($pattern, function ($query, $deleteOldImageIds) {
+                $query->whereNotIn('id', $deleteOldImageIds);
             });
         }])->findOrFail($id);
 
         return compact('store', 'categories');
+    }
+
+    public function update($data, $images, $imageRepository)
+    {
+        DB::beginTransaction();
+        try {
+            Store::where('id', $data['id'])->update(
+                [
+                    'name' => $data['name'],
+                    'price' => $data['price'],
+                    'category_id' => $data['category_id'],
+                    'description' => $data['description'] ?? []
+                ]
+            );
+
+
+            Store::find($data['id'])->images()->saveMany($images);
+
+            $urls = [];
+
+            if (isset($data['deleteOldImageIds'])) {
+                $urls = $imageRepository->getAll(['ids' => $data['deleteOldImageIds']])
+                    ->pluck('url')
+                    ->toArray();
+            }
+
+            $imageRepository->deleteMany($data['deleteOldImageIds'] ?? []);
+
+            DB::commit();
+
+            if (!empty($urls)) {
+                Storage::delete($urls);
+            }
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            abort(500);
+        }
     }
 }

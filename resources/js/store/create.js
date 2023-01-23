@@ -26,7 +26,7 @@ document.addEventListener('alpine:init', () => {
                 quality: 0.5,
 
                 // We want a JPEG file
-                type: files[0].type,
+                type: 'image/jpeg',
             });
 
             const fileReader = new FileReader();
@@ -34,7 +34,7 @@ document.addEventListener('alpine:init', () => {
 
             fileReader.onload = (e) => {
                 const formData = new FormData()
-                formData.append('image', image, files[0].name)
+                formData.append('image', image, files[0].name.split[0] + '.jpeg')
                 axios.post('/image/pre-upload', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'

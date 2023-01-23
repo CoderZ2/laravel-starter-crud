@@ -32,8 +32,9 @@ Route::prefix('inventory')
         Route::get('confirm', 'confirm')->name('confirm');
 
         //update
-        Route::get('update-confirm', 'updateConfirm')->name('updateConfirm');
-        Route::post('update-confirm', 'updateConfirm')->name('updateConfirm');
+        Route::get('update-confirm', 'updateConfirm')->name('update-confirm');
+        Route::post('update-confirm', 'updateConfirm')->name('update-confirm');
+        Route::post('update', 'update')->name('update');
     });
 
 Route::prefix('auth')

@@ -2,18 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\InventoryUpdateRequest;
 use App\Http\Requests\StoreRequest;
+use App\Http\Requests\UpdateInventoryRequest;
 use App\Models\Category;
+use App\Repository\ImageRepository;
 use App\Repository\InventoryRepository;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 
+use function PHPUnit\Framework\returnSelf;
+
 class InventoryController extends Controller
 {
-    public function __construct(protected InventoryRepository $inventoryRepository, protected ImageService $imageService)
-    {
-
+    public function __construct(
+        protected InventoryRepository $inventoryRepository,
+        protected ImageService $imageService,
+        protected ImageRepository $imageRepository,
+    ) {
     }
 
     /**
@@ -64,7 +69,6 @@ class InventoryController extends Controller
      */
     public function show($id)
     {
-
     }
 
     /**
@@ -90,9 +94,13 @@ class InventoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update()
     {
-        //
+        $images = $this->imageService->base64Decode(session('base64Images', []));
+        $data = session('editInventoryData');
+        $this->inventoryRepository->update($data, $images, $this->imageRepository);
+        session()->forget(['base64Images', 'confirm', 'editInventoryData', 'persists']);
+        return to_route('inventory.index');
     }
 
     /**
@@ -122,19 +130,22 @@ class InventoryController extends Controller
         return to_route('inventory.confirm');
     }
 
-    public function updateConfirm(InventoryUpdateRequest $request)
+    public function updateConfirm(UpdateInventoryRequest $request)
     {
         if ($request->isMethod('POST')) {
             session()->flash('persists');
+            $bas64Images = collect(session('base64Images'))
+                ->whereNotIn('id', $request->input('deleteImageIds', []))
+                ->toArray();
+            session()->put('base64Images', $bas64Images);
             session()->flash('editInventoryData', $request->except(['_token', '_method']));
-            return to_route('inventory.updateConfirm');
+            return to_route('inventory.update-confirm');
         }
 
         if ($request->isMethod('GET')) {
             if (!session()->has('persists')) {
                 return to_route('inventory.create');
             }
-
             session()->keep(['editInventoryData', 'persists']);
             return view('pages.inventory.edit-confirm');
         }

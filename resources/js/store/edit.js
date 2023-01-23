@@ -5,7 +5,9 @@ document.addEventListener('alpine:init', () => {
         uploadImageProgress: {},
         maxImageCount: 4,
         get maxImage() {
-            return this.serverImages.length + serverData.image.length < this.maxImageCount
+            return (this.serverImages.length + serverData.image.length) +
+                (this.serverData.oldImages.length - this.serverData.deleteOldImageIds.length) <
+                this.maxImageCount
         },
         async storeImage(el) {
             const files = el.files
@@ -26,7 +28,7 @@ document.addEventListener('alpine:init', () => {
                 quality: 0.5,
 
                 // We want a JPEG file
-                type: files[0].type,
+                type: 'image/jpeg',
             });
 
             const fileReader = new FileReader();
@@ -34,7 +36,7 @@ document.addEventListener('alpine:init', () => {
 
             fileReader.onload = (e) => {
                 const formData = new FormData()
-                formData.append('image', image, files[0].name)
+                formData.append('image', image, files[0].name.split[0] + '.jpeg')
                 axios.post('/image/pre-upload', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
@@ -75,16 +77,27 @@ document.addEventListener('alpine:init', () => {
             return el;
         },
 
-        removeDataImage(id) {
+        removeOldImage(id) {
             this.$refs[`image-${id}`].remove();
+            const input = this.createElement('input', {
+                type: 'hidden',
+                value: id,
+                name: 'deleteOldImageIds[]'
+            })
+            document.getElementById('editInventoryForm').appendChild(input)
+        },
+
+        removeImage(id) {
+            this.$refs[`image-${id}`]?.remove();
+            this.serverImages = this.serverImages.filter(image => image.id != id);
             const input = this.createElement('input', {
                 type: 'hidden',
                 value: id,
                 name: 'deleteImageIds[]'
             })
             document.getElementById('editInventoryForm').appendChild(input)
-        }
-        ,
+        },
+
         async compressImage(file, { quality = 1, type = file.type }) {
             // Get as image data
             const imageBitmap = await createImageBitmap(file);
