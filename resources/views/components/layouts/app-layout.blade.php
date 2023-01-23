@@ -44,7 +44,7 @@
                     </svg>
                 </a>
             </h1>
-            <form class="flex items-center">
+            <form class="flex items-center" action="{{ route('inventory.index') }}">
                 <label class="sr-only" for="simple-search">Search</label>
                 <div class="relative w-[400px]">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">

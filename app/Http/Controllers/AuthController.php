@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
-use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
@@ -32,11 +31,11 @@ class AuthController extends Controller
         ])->withInput(['email']);
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        session()->invalidate();
+        session()->regenerateToken();
         return to_route('auth.login');
     }
 }

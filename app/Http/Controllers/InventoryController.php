@@ -10,7 +10,6 @@ use App\Repository\InventoryRepository;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 
-use function PHPUnit\Framework\returnSelf;
 
 class InventoryController extends Controller
 {
@@ -29,6 +28,7 @@ class InventoryController extends Controller
     public function index(Request $request)
     {
         $data = $this->inventoryRepository->getAll($request->search);
+
         return view('pages.inventory.index', $data);
     }
 
@@ -40,7 +40,7 @@ class InventoryController extends Controller
     public function create(Request $request)
     {
         if (!session('persists')) {
-            session()->forget(['base64Images', 'confirm', 'createData']);
+            session()->forget(['base64Images', 'createData']);
         }
 
         $categories = Category::toBase()->get();
@@ -56,8 +56,11 @@ class InventoryController extends Controller
     public function store()
     {
         $images = $this->imageService->base64Decode(session('base64Images', []));
+
         $this->inventoryRepository->store(session('createData', []), $images);
+
         session()->forget(['base64Images', 'confirm', 'createData']);
+
         return to_route('inventory.index');
     }
 
@@ -69,6 +72,7 @@ class InventoryController extends Controller
      */
     public function show($id)
     {
+        
     }
 
     /**
@@ -82,8 +86,11 @@ class InventoryController extends Controller
         if (!session()->has('persists')) {
             session()->forget(['editInventoryData', 'oldImages', 'base64Images']);
         }
+
         $data = $this->inventoryRepository->edit($id);
+
         session()->put('oldImages', $data['store']->images->toArray());
+
         return view('pages.inventory.edit', $data);
     }
 
@@ -98,8 +105,11 @@ class InventoryController extends Controller
     {
         $images = $this->imageService->base64Decode(session('base64Images', []));
         $data = session('editInventoryData');
+
         $this->inventoryRepository->update($data, $images, $this->imageRepository);
+
         session()->forget(['base64Images', 'confirm', 'editInventoryData', 'persists']);
+
         return to_route('inventory.index');
     }
 
@@ -117,6 +127,7 @@ class InventoryController extends Controller
     public function confirm()
     {
         session()->keep(['persists', 'createData']);
+
         if (!session()->has('persists')) {
             return to_route('inventory.create');
         }
@@ -135,26 +146,33 @@ class InventoryController extends Controller
                 'total'
             ]
         ));
+
         return to_route('inventory.confirm');
     }
 
     public function updateConfirm(UpdateInventoryRequest $request)
     {
         if ($request->isMethod('POST')) {
-            session()->flash('persists');
+
             $bas64Images = collect(session('base64Images'))
                 ->whereNotIn('id', $request->input('deleteImageIds', []))
                 ->toArray();
+
             session()->put('base64Images', $bas64Images);
+            session()->flash('persists');
             session()->flash('editInventoryData', $request->except(['_token', '_method']));
+
             return to_route('inventory.update-confirm');
         }
 
         if ($request->isMethod('GET')) {
+
             if (!session()->has('persists')) {
-                return to_route('inventory.create');
+                return to_route('inventory.index');
             }
+
             session()->keep(['editInventoryData', 'persists']);
+
             return view('pages.inventory.edit-confirm');
         }
     }

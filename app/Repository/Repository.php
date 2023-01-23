@@ -2,6 +2,5 @@
 namespace App\Repository;
 
 class Repository
-{
-    
+{   
 }

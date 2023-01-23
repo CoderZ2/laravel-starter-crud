@@ -18,14 +18,17 @@ class InventoryRepository extends Repository
      */
     public function getAll($search): array
     {
-        $stores = Store::latest()->with('images')->when($search, function ($query, $search) {
-            $pattern = '%' . $search . '%';
-            $query->where('name', 'like', $pattern)
-                ->orWhereHas('category', function ($query) use ($pattern) {
-                    $query->where('name', 'like', $pattern);
-                });
-        })
+        $stores = Store::latest()
+            ->with('images')
+            ->when($search, function ($query, $search) {
+                $pattern = '%' . $search . '%';
+                $query->where('name', 'like', $pattern)
+                    ->orWhereHas('category', function ($query) use ($pattern) {
+                        $query->where('name', 'like', $pattern);
+                    });
+            })
             ->get();
+
         return compact('stores');
     }
 
@@ -42,11 +45,13 @@ class InventoryRepository extends Repository
     {
         $categories = Category::toBase()->get();
         $pattern = session('editInventoryData')['deleteOldImageIds'] ?? false;
-        $store = Store::with(['images' => function ($query)  use ($pattern) {
+
+        $store = Store::with(['images' => function ($query) use ($pattern) {
             return $query->when($pattern, function ($query, $deleteOldImageIds) {
                 $query->whereNotIn('id', $deleteOldImageIds);
             });
-        }])->findOrFail($id);
+        }])
+            ->findOrFail($id);
 
         return compact('store', 'categories');
     }
@@ -55,33 +60,33 @@ class InventoryRepository extends Repository
     {
         DB::beginTransaction();
         try {
-            Store::where('id', $data['id'])->update(
+           Store::find($data['id'])->update(
                 [
                     'name' => $data['name'],
                     'price' => $data['price'],
                     'category_id' => $data['category_id'],
-                    'description' => $data['description'] ?? []
+                    'description' => $data['description'] ?? [],
                 ]
             );
 
+            $urls = [];
 
             Store::find($data['id'])->images()->saveMany($images);
 
-            $urls = [];
-
-            if (isset($data['deleteOldImageIds'])) {
+            if (isset($data['deleteOldImageIds']) && is_array($data['deleteOldImageIds'])) {
                 $urls = $imageRepository->getAll(['ids' => $data['deleteOldImageIds']])
                     ->pluck('url')
                     ->toArray();
-            }
 
-            $imageRepository->deleteMany($data['deleteOldImageIds'] ?? []);
+                $imageRepository->deleteMany($data['deleteOldImageIds']);
+            }
 
             DB::commit();
 
             if (!empty($urls)) {
                 Storage::delete($urls);
             }
+
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error($e->getMessage());

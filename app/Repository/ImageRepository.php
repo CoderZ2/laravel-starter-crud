@@ -17,8 +17,6 @@ class ImageRepository extends Repository
 
     public function deleteMany($ids)
     {
-        if(!empty($ids)) {
-            Image::whereIn('id', $ids)->delete();
-        }
+        Image::whereIn('id', $ids)->delete();
     }
 }

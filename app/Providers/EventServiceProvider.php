@@ -2,13 +2,18 @@
 
 namespace App\Providers;
 
+use App\Models\Image;
+use App\Observers\ImageObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
-{
+{   
+    protected $observers = [
+        Image::class => [ImageObserver::class]
+    ];
     /**
      * The event to listener mappings for the application.
      *
@@ -27,7 +32,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Image::observe(ImageObserver::class);
     }
 
     /**
