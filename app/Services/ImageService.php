@@ -29,7 +29,7 @@ class ImageService
             $path = 'upload' . '/' . 'images';
             $url = $path . '/' . uniqid() . '.' . $image['ext'];
             $file = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image['url']));
-            Storage::put($url, $file);
+            Storage::disk('public')->put($url, $file);
             $images[] = new Image([
                 'url' => $url,
             ]);

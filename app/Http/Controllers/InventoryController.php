@@ -126,7 +126,15 @@ class InventoryController extends Controller
 
     public function postConfirm(StoreRequest $request)
     {
-        session()->flash('createData', array_merge($request->safe()->only(['name', 'price', 'category_id', 'description', 'total'])));
+        session()->flash('createData', $request->safe()->only(
+            [
+                'name',
+                'price',
+                'category_id',
+                'description',
+                'total'
+            ]
+        ));
         return to_route('inventory.confirm');
     }
 

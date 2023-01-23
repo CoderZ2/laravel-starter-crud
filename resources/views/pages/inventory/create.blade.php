@@ -20,7 +20,7 @@
                            for="price">Price</label>
                     <input class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-lime-500 focus:border-lime-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-lime-500 dark:focus:border-lime-500"
                            id="price" name="price" type="number"
-                           value="{{ session('createData')['price'] ?? old('price') }}" >
+                           value="{{ session('createData')['price'] ?? old('price') }}">
                     @error('price')
                         <div class="text-red-500">{{ $message }}</div>
                     @enderror
@@ -49,6 +49,18 @@
                 <div x-data="storeCreate">
                     <input type="file" hidden x-ref="upload" @click="$el.value=''" @change="storeImage($el)">
                     <div class="grid grid-cols-3 gap-3 mb-6">
+                        @foreach (session('base64Images', []) as $image)
+                            <div
+                                 class="block h-[100px] p-2 cursor-pointer bg-white border border-gray-200 rounded-lg shadow-md hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                                <img class="w-[100%] h-[100%]" src="{{ $image['url'] }}" alt="image" loading="lazy">
+                            </div>
+                        @endforeach
+                        <template x-for="image in serverImages">
+                            <div
+                                 class="block h-[100px] p-2 cursor-pointer bg-white border border-gray-200 rounded-lg shadow-md hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                                <img class="w-[100%] h-[100%]" alt="image" x-bind:src="image.url">
+                            </div>
+                        </template>
                         <div class="block h-[100px] relative p-2  bg-white border border-gray-200 rounded-lg shadow-md  dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
                              x-cloak x-show="Object.keys(uploadImageProgress).length">
                             <div
@@ -62,18 +74,6 @@
                             <img class="w-[100%] h-[100%]" alt="image" x-bind:src="uploadImageProgress.url"
                                  loading="lazy">
                         </div>
-                        @foreach (session('base64Images', []) as $image)
-                            <div
-                                 class="block h-[100px] p-2 cursor-pointer bg-white border border-gray-200 rounded-lg shadow-md hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-                                <img class="w-[100%] h-[100%]" src="{{ $image['url'] }}" alt="image" loading="lazy">
-                            </div>
-                        @endforeach
-                        <template x-for="image in serverImages">
-                            <div
-                                 class="block h-[100px] p-2 cursor-pointer bg-white border border-gray-200 rounded-lg shadow-md hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-                                <img class="w-[100%] h-[100%]" alt="image" x-bind:src="image.url">
-                            </div>
-                        </template>
                         <div class="border-dashed h-[100px] cursor-pointer  border border-lime-400 flex justify-center items-center"
                              x-show="maxImage" @click="$refs.upload.click()">
                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"

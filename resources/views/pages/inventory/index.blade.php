@@ -7,7 +7,7 @@
                      <div class="absolute top-2 right-3 bg-lime-500 py-[0.2rem] px-2 flex items-center text-white rounded-md leading-0">1kg/ {{ $store->price }}$</div>
                     <a href="{{ route('inventory.edit', ['id' => $store->id]) }}">
                         <img class="rounded-t-lg w-full"
-                             src="{{ asset($store->images->first()->url) }}"
+                             src="{{  Storage::url($store->images->first()->url) }}"
                              alt="image" />
                     </a>
                     <div class="p-5">
